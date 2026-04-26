@@ -49,7 +49,7 @@
             <h4 style="color:#fff">Navigation</h4>
             <ul>
                 <li><a href="#home">Home</a></li>
-                <li><a href="#">About Us</a></li>
+                <li><a href="#">We Offer</a></li>
                 <li><a href="#">FAQ’s</a></li>
                 <li><a href="#">Discover</a></li>
 <li>

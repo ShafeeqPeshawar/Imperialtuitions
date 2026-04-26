@@ -34,16 +34,31 @@ class TrainingController extends Controller
     public function storeCategory(Request $request)
     {
         $request->validate([
-            'name'       => 'required|string|max:255',
+      'name'       => 'required|string|max:255|unique:training_categories,name', // ✅ added unique
+
             'sort_order' => 'nullable|integer|min:0',
         ]);
 
-        TrainingCategory::create([
-            'name'       => $request->name,
-            'slug'       => Str::slug($request->name),
-            'sort_order' => $request->sort_order ?? 0,   // 👈 added
-        ]);
+    // Auto-generate sort_order if empty
+if (!$request->sort_order) {
 
+    $lastSortOrder = TrainingCategory::max('sort_order');
+
+    $sortOrder = $lastSortOrder
+        ? $lastSortOrder + 10
+        : 10;
+
+} else {
+
+    $sortOrder = $request->sort_order;
+
+}
+
+TrainingCategory::create([
+    'name'       => $request->name,
+    'slug'       => Str::slug($request->name),
+    'sort_order' => $sortOrder,
+]);
         return redirect()
             ->route('training.categories.index')
             ->with('success', 'Category added');
@@ -57,7 +72,7 @@ class TrainingController extends Controller
     public function updateCategory(Request $request, TrainingCategory $category)
     {
         $request->validate([
-            'name'       => 'required|string|max:255',
+                'name'       => 'required|string|max:255|unique:training_categories,name,' . $category->id, // ✅ unique with ignore
             'sort_order' => 'nullable|integer|min:0',
         ]);
 

@@ -5,7 +5,7 @@
 <div class="max-w-3xl">
 
     <!-- Page Title -->
-    <h2 class="text-2xl font-semibold text-white mb-6">
+    <h2 class="text-2xl font-semibold text-black mb-6">
         Edit Training Category
     </h2>
 

@@ -1,3 +1,5 @@
+@include('components.home.navbar')
+
 <section class="course-detail-wrapper pdf-wrapper" id="courseContent">
 
    <!-- HERO -->
@@ -6,11 +8,6 @@
     <!-- LEFT SIDE -->
     <div class="hero-left">
 
-<a href="https://phplaravel-1208793-6158387.cloudwaysapps.com/"
-   class="hero-badge pdf-link"
-   target="_blank">
-    Imperial Tuitions Trainings
-</a>
         <h1 class="hero-title">{{ $course->title }}</h1>
       
 <div class="hero-description">
@@ -140,7 +137,7 @@ onclick="openEnrollModal('{{ $course->title }}', {{ $course->id }})">
 
        
 
-        <div class="card">
+        <div class="card card-course-learn">
             <h3 class="sec-title">What you will learn ?</h3>
 
             @if($course->topics->count())
@@ -246,7 +243,7 @@ onclick="openEnrollModal(
 @endif
 
 
-        <div class="card">
+        <div class="card course-cta-card">
            <!-- CTA BUTTONS -->
             <!-- <div id="launchMessage"
      style="display:none; margin-top:12px; color: #09515D; font-weight:600;">
@@ -278,6 +275,10 @@ onclick="openEnrollModal(
 
     </div>
 </section>
+
+<div class="course-print-page-footer" aria-hidden="true">
+    <a href="https://www.imperialtuitions.com/">www.imperialtuitions.com</a>
+</div>
 
 <!-- ENROLL MODAL -->
  <!-- ENROLL MODAL -->
@@ -505,10 +506,35 @@ onclick="openEnrollModal(
 </div>
 
 <style>
+    
 /* ===============================
    SUCCESS POPUP – COMPACT & CLEAN
    =============================== */
+/* -----------------------------
+   INQUIRY BUTTON – ICON HIDE + BOLD TEXT
+   ----------------------------- */
+.snapshot-card-actions .btn-inquiry.btn-snapshot i,
+.btn-inquiry i {
+    display: none !important;   /* Hide icon */
+}
 
+.snapshot-card-actions .btn-inquiry.btn-snapshot,
+.btn-inquiry {
+    font-weight: 900 !important;   /* Bold text */
+    color: #fff !important;        /* Ensure text color */
+    background: #09515D !important; /* Reset background so it stays original */
+    border-color: #09515D !important; /* Reset border */
+}
+
+/* Mobile responsiveness (optional) */
+@media (max-width: 640px) {
+    .snapshot-card-actions .btn-inquiry.btn-snapshot,
+    .btn-inquiry {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 16px 0 !important;
+        font-size: 15px !important;
+    }
 #successModal{
     z-index:10000;
 }
@@ -795,6 +821,7 @@ onclick="openEnrollModal(
         margin-left:0;
     }
 }
+
 /* ===============================
    CTA BUTTONS – RESPONSIVE FIX
    =============================== */
@@ -850,6 +877,19 @@ onclick="openEnrollModal(
     box-shadow:0 12px 28px rgba(15,23,42,.08);
 }
 
+.card-course-learn{
+    border: 1px solid #b8c0df;
+    background:
+        linear-gradient(165deg, rgba(255, 255, 255, 0.3) 0%, transparent 48%),
+        #d3d9ef;
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.9) inset,
+        0 2px 6px rgba(15, 23, 42, 0.06),
+        0 12px 28px -10px rgba(15, 23, 42, 0.14),
+        0 22px 48px -16px rgba(15, 23, 42, 0.12),
+        0 34px 70px -26px rgba(15, 23, 42, 0.09);
+}
+
 .sec-title{
     font-size:18px;
     font-weight:800;
@@ -876,6 +916,12 @@ onclick="openEnrollModal(
     border:1px solid #e5e7eb;
     padding:16px;
     border-radius:12px;
+}
+
+/* Course detail: each topic row under “What you will learn?” */
+.card-course-learn .topic-item{
+    background:#d3d9ef;
+    border:1px solid #b8c0df;
 }
 
 .topic-title{
@@ -1621,6 +1667,11 @@ body.pdf-mode .launch-row{
 body.pdf-mode .hero-snapshot{
     background:#fff !important;
 }
+
+/* CTA card: buttons hidden in PDF but .card kept a border — hide whole block */
+body.pdf-mode .course-cta-card{
+    display: none !important;
+}
 /* ===============================
    PDF SAFE LAYOUT (CRITICAL)
    =============================== */
@@ -1860,6 +1911,67 @@ body.pdf-mode .pdf-link{
     }
 }
 
+/* ----- Print: same layout as PDF (pdf-mode + only #courseContent + footer link) ----- */
+.course-print-page-footer {
+    display: none !important;
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0.5in 0.4in 0.6in 0.4in;
+    }
+
+    body.course-print-active * {
+        visibility: hidden !important;
+    }
+    body.course-print-active #courseContent,
+    body.course-print-active #courseContent * {
+        visibility: visible !important;
+    }
+    body.course-print-active .course-print-page-footer,
+    body.course-print-active .course-print-page-footer * {
+        visibility: visible !important;
+    }
+
+    body.course-print-active #courseContent {
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* “What you will learn ?” topics card on next page (same intent as main course template PDF) */
+    body.course-print-active .card-course-learn {
+        break-before: page !important;
+        page-break-before: always !important;
+    }
+
+    body.course-print-active .course-print-page-footer {
+        display: block !important;
+        position: fixed !important;
+        bottom: 0.3in !important;
+        left: 0 !important;
+        right: 0 !important;
+        text-align: center !important;
+        font-family: Helvetica, Arial, sans-serif !important;
+        font-size: 11pt !important;
+        font-weight: normal !important;
+        color: #09515D !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        z-index: 99999 !important;
+    }
+
+    body.course-print-active .course-print-page-footer a {
+        color: #09515D !important;
+        text-decoration: none !important;
+    }
+}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -1903,14 +2015,64 @@ function closeEnrollModal(){
     document.getElementById('enrollModal').style.display='none';
 }
 
-/* PRINT */
+/* PRINT — same appearance as PDF: pdf-mode + margins + footer link */
 function printCourse(){
-    window.print();
+    function cleanup(){
+        document.body.classList.remove('pdf-mode', 'course-print-active');
+    }
+    function onAfterPrint(){
+        cleanup();
+        window.removeEventListener('afterprint', onAfterPrint);
+    }
+    document.body.classList.add('pdf-mode', 'course-print-active');
+    function doPrint(){
+        window.addEventListener('afterprint', onAfterPrint);
+        window.print();
+        setTimeout(function(){
+            if (document.visibilityState === 'visible') {
+                cleanup();
+                window.removeEventListener('afterprint', onAfterPrint);
+            }
+        }, 800);
+    }
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+            requestAnimationFrame(doPrint);
+        }).catch(doPrint);
+    } else {
+        setTimeout(doPrint, 200);
+    }
 }
 
-// pdf
+// pdf — clickable site link centered at bottom of every page
+function addImperialTuitionsPdfFooter(pdf) {
+    var footerText = 'www.imperialtuitions.com';
+    var footerUrl = 'https://www.imperialtuitions.com/';
+    var totalPages = pdf.internal.getNumberOfPages();
+    var pageWidth = pdf.internal.pageSize.getWidth();
+    var pageHeight = pdf.internal.pageSize.getHeight();
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(11);
+    pdf.setTextColor(9, 81, 93);
+    for (var p = 1; p <= totalPages; p++) {
+        pdf.setPage(p);
+        var textWidth = pdf.getTextWidth(footerText);
+        var x = (pageWidth - textWidth) / 2;
+        var y = pageHeight - 0.3;
+        if (typeof pdf.textWithLink === 'function') {
+            pdf.textWithLink(footerText, x, y, { url: footerUrl });
+        } else {
+            pdf.text(footerText, x, y);
+            var linkH = 0.17;
+            pdf.link(x, y - linkH + 0.02, textWidth, linkH, { url: footerUrl });
+        }
+    }
+    return pdf;
+}
+
 function downloadPDF(){
     const element = document.getElementById('courseContent');
+    if (!element) return;
 
     document.body.classList.add('pdf-mode');
 
@@ -1942,8 +2104,17 @@ function downloadPDF(){
     html2pdf()
         .set(opt)
         .from(element)
+        .toPdf()
+        .get('pdf')
+        .then(function (pdf) {
+            addImperialTuitionsPdfFooter(pdf);
+            return pdf;
+        })
         .save()
-        .then(() => {
+        .then(function () {
+            document.body.classList.remove('pdf-mode');
+        })
+        .catch(function () {
             document.body.classList.remove('pdf-mode');
         });
 }

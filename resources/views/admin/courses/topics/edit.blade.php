@@ -5,15 +5,15 @@
 <div class="max-w-3xl">
 
     <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-semibold text-white">
+        <h2 class="text-2xl font-semibold text-black">
             Edit Topic
-            <span class="block text-sm font-normal text-gray-300">
+            <span class="block text-sm font-normal text-gray-800">
                 {{ $course->title }}
             </span>
         </h2>
 
         <a href="{{ route('admin.courses.topics', $course) }}"
-           class="text-sm text-gray-300 hover:text-white">
+           class="text-sm text-gray-800 hover:text-black">
             ← Back to Topics
         </a>
     </div>
@@ -93,17 +93,23 @@
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 
 <script>
+      var Size = Quill.import('attributors/style/size');
+Size.whitelist = ['10px','12px','14px','16px','18px','24px','32px'];
+Quill.register(Size, true);
     const quill = new Quill('#topicEditor', {
         theme: 'snow',
         placeholder: 'Edit topic description...',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{ list: 'ordered' }, { list: 'bullet' }],
-                ['link'],
-                ['clean']
-            ]
-        }
+     modules: {
+    toolbar: [
+        [{ font: [] }],          // <-- font dropdown added
+          [{ size: ['10px','12px','14px','16px','18px','24px','32px'] }],
+        ['bold', 'italic', 'underline'],
+        [{ header: [1, 2, 3, false] }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link'],
+        ['clean']
+    ]
+}
     });
 
     // ✅ Load existing description
@@ -123,5 +129,13 @@
         document.getElementById('topicDescription').value = html;
     });
 </script>
+<style>
+.ql-snow .ql-picker.ql-size .ql-picker-item::before {
+    content: attr(data-value) !important;
+}
 
+.ql-snow .ql-picker.ql-size .ql-picker-label::before {
+    content: attr(data-value) !important;
+}
+</style>
 @endsection

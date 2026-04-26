@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -9,16 +10,18 @@ class SubscriberBroadcastMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $content;
+    public $name;    // ← add this
+    public $content; // ← add this
 
-    public function __construct($content)
+    public function __construct($name, $content)
     {
+        $this->name = $name;
         $this->content = $content;
     }
 
     public function build()
     {
-        return $this->subject('Message from BTMG Trainings')
-            ->view('emails.subscriber-message');
+        return $this->subject('Message from Imperial Tuitions')
+                    ->view('emails.subscriber-message');
     }
 }

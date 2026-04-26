@@ -1,0 +1,144 @@
+================================================================================
+IMPERIAL TUITIONS-11 — CHANGES MADE & MANUAL STEPS FOR YOU
+================================================================================
+This file summarizes what was changed in the codebase and what you should
+handle yourself (environment, hosting, operations).
+
+================================================================================
+PART A — WHAT WAS CHANGED (IN THE PROJECT)
+================================================================================
+
+A.1 Routes (routes/web.php)
+--------------------------------------------------------------------------------
+- Reorganized into clear sections: public forms, public pages, auth dashboard/
+  profile, admin, admin training.
+- All admin actions (courses, topics, launches, enrollments, inquiries,
+  contacts, subscribers) are under /admin/... with the auth middleware.
+- Training gallery management (categories & images) is only under
+  /admin/training/... with auth (the old public /training/* CRUD URLs were
+  removed).
+- Registered courses/popular, make-popular, remove-popular, and
+  courses/{course}/topics BEFORE Route::resource('courses') so "popular" is
+  not mistaken for a course id.
+- Removed duplicate route definitions (e.g. duplicate course-enrollments
+  index, duplicate course-launches registration).
+- Added throttle middleware on: contact, course-enroll, course-inquiry,
+  subscribe, and admin subscriber broadcast.
+
+A.2 AppServiceProvider
+--------------------------------------------------------------------------------
+- CourseLaunch::observe(...) runs once in boot(), not inside a view composer.
+- Pending counts (enrollments, contacts, inquiries) are passed only via
+  View::composer('layouts.admin', ...), not on every view in the app.
+
+A.3 Course launches & emails
+--------------------------------------------------------------------------------
+- CourseLaunchController::store no longer loops subscribers to send mail;
+  CourseLaunchObserver handles free-course launch notifications only.
+- This removes duplicate emails when creating a launch.
+- CourseLaunchObserver: safer free-course check (null course, is_numeric,
+  float comparison).
+
+A.4 Mailables (queuing)
+--------------------------------------------------------------------------------
+- FreeCourseLaunchMail and SubscriberBroadcastMail implement ShouldQueue so
+  they can be processed by a queue worker (when you configure a non-sync
+  queue).
+
+A.5 Public training page
+--------------------------------------------------------------------------------
+- WebsiteController::training() added; GET /training shows training.page.
+- New view: resources/views/training-page.blade.php (navbar, training
+  section, footer).
+- Admin training hub remains at /admin/training (training.index).
+
+A.6 Admin UI / enrollments
+--------------------------------------------------------------------------------
+- Course enrollments index uses paginate(20) and shows pagination links.
+- layouts/admin.blade.php: sidebar link to training gallery uses
+  route('training.index') and training.* for active state.
+- admin/courses/index.blade.php: make-popular form posts to
+  route('admin.courses.makePopular').
+
+A.7 Controllers cleanup
+--------------------------------------------------------------------------------
+- ContactController: reply/destroy indentation normalized.
+- CourseInquiryController: formatting cleanup; unused Carbon import removed.
+
+A.8 Security: phpMyAdmin removed
+--------------------------------------------------------------------------------
+- The folder public/phpMyAdmin was deleted from the project. It is no longer
+  served from your app’s public directory.
+
+A.9 CODE_REVIEW_FINDINGS.txt
+--------------------------------------------------------------------------------
+- A short note was added at the top that many findings were addressed in a
+  follow-up pass.
+
+================================================================================
+PART B — WHAT YOU SHOULD DO MANUALLY
+================================================================================
+
+B.1 Queue configuration (important if you use real email in production)
+--------------------------------------------------------------------------------
+- FreeCourseLaunchMail and SubscriberBroadcastMail are queued (ShouldQueue).
+- If QUEUE_CONNECTION=sync (default), jobs still run during the web request;
+  they are not duplicated anymore, but the request may stay slow for many
+  subscribers.
+
+Recommended for production:
+  1. Set QUEUE_CONNECTION=database (or redis).
+  2. If database: run  php artisan queue:table  then  php artisan migrate
+     (if you have not created the jobs table yet).
+  3. Run a worker on the server, e.g.  php artisan queue:work
+     (use Supervisor, systemd, or your host’s “worker” feature so it stays
+     running).
+
+B.2 Email / .env
+--------------------------------------------------------------------------------
+- Confirm MAIL_* settings in .env for your provider (SMTP, Mailgun, etc.).
+- Send a test: create a free course launch in admin and/or use subscriber
+  broadcast after the queue worker is running.
+
+B.3 Database access without phpMyAdmin in public/
+--------------------------------------------------------------------------------
+- If you still want phpMyAdmin, install it outside public_html, or use:
+  - TablePlus, DBeaver, HeidiSQL, MySQL Workbench, or
+  - Your hosting control panel’s database tool.
+- Do not copy phpMyAdmin back into public/ on a live site unless it is
+  locked down (IP allowlist, strong auth, separate subdomain).
+
+B.4 Deploy / server checklist
+--------------------------------------------------------------------------------
+- After deploy:  php artisan migrate --force  (if you have pending migrations).
+- Clear caches when appropriate:  php artisan config:clear
+  php artisan route:clear  php artisan view:clear
+- For production performance:  php artisan config:cache  and
+  php artisan route:cache  (only when config/routes are stable).
+
+B.5 Verify routes and admin login
+--------------------------------------------------------------------------------
+- Log in and open: /admin/training, /admin/courses, course topics, launches,
+  enrollments, inquiries, contacts, subscribers.
+- Confirm /training (public gallery) loads as expected.
+- Confirm GET /search-courses still works from the homepage search (it stays
+  public for autocomplete).
+
+B.6 Optional follow-ups (not done in the fix pass)
+--------------------------------------------------------------------------------
+- Extract repeated validation into Form Request classes.
+- Extract shared “next sort_order” logic into a small helper or trait.
+- Standardize all mail on Mailable classes (some flows still use Mail::send
+  with closures).
+- Add a navbar link to route('training.page') if you want the gallery in
+  the main menu.
+
+B.7 Backups and version control
+--------------------------------------------------------------------------------
+- Commit the changes; keep a backup before deploying.
+- If you relied on public phpMyAdmin for daily work, document your new DB
+  workflow for your team.
+
+================================================================================
+END
+================================================================================

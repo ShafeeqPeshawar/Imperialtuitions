@@ -16,6 +16,9 @@ class DashboardController extends Controller
         // KPI counts
         $totalEnrollments = CourseEnrollment::count();
         $totalActiveCourses = Course::where('is_active', 1)->count();
+        // Pending Inquiries Counts
+$pendingInquiriesCount = CourseInquiry::where('reply_status', 'pending')->count();
+$pendingContactsCount = Contact::where('reply_status', 'pending')->count();
 
         // Recent Enrollments
         $enrollments = CourseEnrollment::latest()
@@ -67,7 +70,9 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'totalEnrollments',
             'totalActiveCourses',
-            'recentActivities'
-        ));
+            'recentActivities',
+             'pendingInquiriesCount',
+    'pendingContactsCount'
+        ))->with('title', 'Dashboard');
     }
 }

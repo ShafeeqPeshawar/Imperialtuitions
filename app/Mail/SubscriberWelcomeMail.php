@@ -10,17 +10,20 @@ class SubscriberWelcomeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $email;
+   public $name;
 
-    public function __construct($email)
-    {
-        $this->email = $email;
-    }
+public function __construct($name)
+{
+    $this->name = $name;
+}
 
-    public function build()
-    {
-        return $this
-            ->subject('Welcome to  Imperial Tuitions  – You’re Subscribed!')
-            ->view('emails.subscriber_welcome');
-    }
+   public function build()
+{
+    return $this
+        ->subject('Welcome to Imperial Tuitions  – You’re Subscribed!')
+        ->view('emails.subscriber_welcome')
+        ->with([
+            'name' => $this->name,
+        ]);
+}
 }

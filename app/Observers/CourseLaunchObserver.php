@@ -12,8 +12,12 @@ class CourseLaunchObserver
     {
         $course = $launch->course;
 
-        // ✅ Safety check (only FREE courses)
-        if ($course->price != 0) {
+        if ($course === null) {
+            return;
+        }
+
+        // Only free courses (treat null/non-numeric as not free)
+        if (! is_numeric($course->price) || (float) $course->price != 0.0) {
             return;
         }
 

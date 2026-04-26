@@ -7,5 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 // app/Models/Subscriber.php
 class Subscriber extends Model
 {
-    protected $fillable = ['email'];
+   protected $fillable = [
+    'email',
+    'name', // ← add this
+];
 }

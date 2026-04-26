@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-semibold text-white">
+    <h2 class="text-2xl font-semibold text-black">
         Course Inquiries
     </h2>
 </div>
@@ -93,19 +93,20 @@
         </button>
 
         <!-- DELETE -->
-        <form method="POST"
-              action="{{ route('admin.course-inquiries.destroy', $inquiry) }}"
-              onsubmit="return confirm('Are you sure you want to delete this inquiry?')"
-              class="shrink-0">
-            @csrf
-            @method('DELETE')
+      <!-- DELETE -->
+<form method="POST"
+      id="del-{{ $inquiry->id }}"
+      action="{{ route('admin.course-inquiries.destroy', $inquiry) }}"
+      class="shrink-0">
+    @csrf
+    @method('DELETE')
 
-            <button
-                type="submit"
-                class="text-red-600 hover:underline text-sm font-semibold">
-                Delete
-            </button>
-        </form>
+    <button type="button"
+        onclick="openDeleteModal({{ $inquiry->id }})"
+        class="text-red-600 hover:underline text-sm font-semibold">
+        Delete
+    </button>
+</form>
 
     </div>
 </td>
@@ -163,7 +164,15 @@ class="fixed inset-0 bg-black/70 hidden z-50 flex items-start justify-center ove
     </div>
 </div>
 </div>
-
+<!-- DELETE CONFIRM MODAL -->
+<div id="deleteModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:30px; border-radius:12px; width:350px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <h3>Delete Inquiry?</h3>
+        <p style="color:#555; margin-bottom:20px;">Are you sure you want to delete this inquiry permanently?</p>
+        <button onclick="confirmDelete()" style="background:#dc3545;color:white;border:none;padding:10px 20px;border-radius:6px;">Delete</button>
+        <button onclick="closeDeleteModal()" style="background:#6c757d;color:white;border:none;padding:10px 20px;border-radius:6px;">Cancel</button>
+    </div>
+</div>
 @endsection
 @push('scripts')
 <script>
@@ -217,6 +226,22 @@ function openInquiryModal(id) {
 
 function closeInquiryModal() {
     document.getElementById('inquiryModal').classList.add('hidden');
+}
+let deleteId = null;
+
+function openDeleteModal(id) {
+    deleteId = id;
+    document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
+
+function confirmDelete() {
+    if(deleteId){
+        document.getElementById('del-' + deleteId).submit();
+    }
 }
 </script>
 @endpush

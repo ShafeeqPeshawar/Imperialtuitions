@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="flex justify-between mb-6">
-    <h2 class="text-2xl font-semibold text-white">Course Launch Dates</h2>
+    <h2 class="text-2xl font-semibold text-black">Course Launch Dates</h2>
     <a href="{{ route('admin.course-launches.create') }}"
        class="bg-yellow-500 px-4 py-2 rounded font-semibold">
         + Add

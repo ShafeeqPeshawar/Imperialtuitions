@@ -4,7 +4,7 @@
 
 @section('content')
 
-<h2 class="text-2xl font-semibold text-white mb-6">Add Course Launch Date</h2>
+<h2 class="text-2xl font-semibold text-black mb-6">Add Course Launch Date</h2>
 
 <form method="POST" action="{{ route('admin.course-launches.store') }}"
       class="bg-white p-6 rounded-lg space-y-4 max-w-xl">

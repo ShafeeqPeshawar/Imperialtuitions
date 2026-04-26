@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-semibold text-white">
+    <h2 class="text-2xl font-semibold text-black">
         Course Enrollments
     </h2>
 </div>
@@ -122,17 +122,18 @@
     </button>
 
     <!-- DELETE -->
-    <form method="POST"
-          action="{{ route('admin.course-enrollments.destroy', $enroll->id) }}"
-          onsubmit="return confirm('Are you sure you want to delete this enrollment?');">
-        @csrf
-        @method('DELETE')
+   <!-- DELETE -->
+<button type="button" onclick="openDeleteModal({{ $enroll->id }})"
+    class="text-red-600 hover:underline text-sm">
+    Delete
+</button>
 
-        <button type="submit"
-            class="text-red-600 hover:underline text-sm">
-            Delete
-        </button>
-    </form>
+<form id="del-{{ $enroll->id }}" method="POST"
+      action="{{ route('admin.course-enrollments.destroy', $enroll->id) }}"
+      style="display:none;">
+    @csrf
+    @method('DELETE')
+</form>
 
 </td>
 
@@ -148,6 +149,10 @@
             @endforelse
         </tbody>
     </table>
+
+    <div class="px-4 py-3 border-t border-gray-200">
+        {{ $enrollments->links() }}
+    </div>
 
 </div>
 <!--  -->
@@ -238,7 +243,15 @@
 
     </div>
 </div>
-
+<!-- DELETE CONFIRM MODAL -->
+<div id="deleteModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:30px; border-radius:12px; width:350px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <h3>Delete Enrollment?</h3>
+        <p style="color:#555; margin-bottom:20px;">Are you sure you want to delete this enrollment permanently?</p>
+        <button onclick="confirmDelete()" style="background:#dc3545;color:white;border:none;padding:10px 20px;border-radius:6px;">Delete</button>
+        <button onclick="closeDeleteModal()" style="background:#6c757d;color:white;border:none;padding:10px 20px;border-radius:6px;">Cancel</button>
+    </div>
+</div>
 
 @endsection
 @push('scripts')
@@ -345,6 +358,22 @@ approveBtn.addEventListener('click', () => {
 rejectBtn.addEventListener('click', () => {
     replyMessage.removeAttribute('required');
 });
+let deleteId = null;
+
+function openDeleteModal(id) {
+    deleteId = id;
+    document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
+
+function confirmDelete() {
+    if(deleteId){
+        document.getElementById('del-' + deleteId).submit();
+    }
+}
 </script>
 
 @endpush

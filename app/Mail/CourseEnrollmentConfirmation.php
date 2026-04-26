@@ -21,7 +21,7 @@ class CourseEnrollmentConfirmation extends Mailable
     public function build()
     {
         return $this
-            ->subject('Enrollment Confirmation – BTMG USA Training')
+            ->subject('Imperial Tuitions – Registration Received')
             ->view('emails.course-enrollment-confirmation');
     }
 }

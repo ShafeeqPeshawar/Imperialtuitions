@@ -19,7 +19,7 @@ class CourseController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        return view('admin.courses.index', compact('courses'));
+        return view('admin.courses.index', compact('courses'))->with('title', 'Manage Courses');
     }
 
     /* ==============================
@@ -29,7 +29,7 @@ class CourseController extends Controller
     {
         $categories = TrainingCategory::orderBy('name')->get();
 
-        return view('admin.courses.create', compact('categories'));
+        return view('admin.courses.create', compact('categories'))->with('title', 'Add Course');
     }
 
     /* ==============================
@@ -39,18 +39,35 @@ class CourseController extends Controller
     {
         $request->validate([
             'title'                 => 'required|string|max:255',
-            'description'           => 'nullable|string',
+            'description'           => 'required|string|min:10', 
             'image'                 => 'required|image|mimes:png,jpg,jpeg,webp',
             'level'                 => 'nullable|string|max:100',
             'duration_value' => 'required|integer|min:1',
             'duration_unit'  => 'required|string|in:hours,days,weeks,months',
             'price'                 => 'nullable|numeric',
             'skills'                => 'nullable|string',
-            'sort_order'            => 'required|integer',
+            'sort_order' => 'nullable|integer',
             'training_category_id'  => 'nullable|exists:training_categories,id',
         ]);
+$exists = Course::where('title', $request->title)
+    ->where('level', $request->level)
+    ->exists();
 
-        // Upload image
+if ($exists) {
+    return back()
+        ->withInput()
+        ->withErrors([
+            'level' => 'A course with this title already exists in this level!'
+        ]);
+}
+// Auto-generate sort_order if empty
+if (!$request->sort_order) {
+    $lastSortOrder = Course::max('sort_order');
+    $sortOrder = $lastSortOrder ? $lastSortOrder + 10 : 10;
+} else {
+    $sortOrder = $request->sort_order;
+}    
+// Upload image
         $imageName = time() . '.' . $request->image->extension();
         $request->image->move(public_path('images'), $imageName);
 
@@ -62,7 +79,7 @@ class CourseController extends Controller
             'duration' => $request->duration_value . ' ' . ucfirst($request->duration_unit),
             'price'                => $request->price,
             'skills'               => $request->skills,
-            'sort_order'           => $request->sort_order,
+            'sort_order' => $sortOrder,
             'is_active'            => $request->has('is_active'),
             'training_category_id' => $request->training_category_id, // ✅ CATEGORY
         ]);
@@ -79,7 +96,7 @@ class CourseController extends Controller
     {
         $categories = TrainingCategory::orderBy('name')->get();
 
-        return view('admin.courses.edit', compact('course', 'categories'));
+        return view('admin.courses.edit', compact('course', 'categories'))->with('title', 'Edit Course');
     }
 
     /* ==============================
@@ -89,7 +106,7 @@ class CourseController extends Controller
     {
         $request->validate([
             'title'                 => 'required|string|max:255',
-            'description'           => 'nullable|string',
+            'description'           => 'required|string',
             'image'                 => 'nullable|image|mimes:png,jpg,jpeg,webp',
             'level'                 => 'nullable|string|max:100',
             'duration_value' => 'required|integer|min:1',
@@ -111,7 +128,18 @@ class CourseController extends Controller
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $imageName);
         }
+$exists = Course::where('title', $request->title)
+    ->where('level', $request->level)
+    ->where('id', '!=', $course->id)
+    ->exists();
 
+if ($exists) {
+    return back()
+        ->withInput()
+        ->withErrors([
+            'level' => 'A course with this title already exists in this level!'
+        ]);
+}
         $course->update([
             'title'                => $request->title,
             'description'          => $request->description,
@@ -180,7 +208,7 @@ public function popular()
         ->orderBy('sort_order')
         ->get();
 
-    return view('admin.courses.popular', compact('courses'));
+    return view('admin.courses.popular', compact('courses'))->with('title', 'Popular Courses');
 }
 public function removePopular(Request $request)
 {

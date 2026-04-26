@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-semibold text-white">
+    <h2 class="text-2xl font-semibold text-black">
         Contact Submissions
     </h2>
 </div>
@@ -51,14 +51,30 @@
                 @endif
             </td>
 
-            {{-- Action --}}
-            <td class="px-4 py-3 text-center">
-                <button
-                    onclick="openContactModal({{ $contact->id }})"
-                    class="text-blue-600 hover:underline text-sm">
-                    View Details
-                </button>
-            </td>
+           <td class="px-4 py-3 text-center">
+    <button
+        onclick="openContactModal({{ $contact->id }})"
+        class="text-blue-600 hover:underline text-sm">
+        View Details /
+    </button>
+
+   
+
+  <!-- DELETE -->
+<form method="POST"
+      id="del-{{ $contact->id }}"
+      action="{{ route('admin.contacts.destroy', $contact->id) }}"
+      style="display:inline;">
+    @csrf
+    @method('DELETE')
+
+    <button type="button"
+            onclick="openDeleteModal({{ $contact->id }})"
+            class="text-red-600 hover:underline text-sm font-semibold">
+        Delete
+    </button>
+</form>
+</td>
 
         </tr>
         @empty
@@ -125,7 +141,15 @@ class="fixed inset-0 bg-black/70 hidden z-50 flex items-start justify-center ove
     </div>
 </div>
 </div>
-
+<!-- DELETE CONFIRM MODAL -->
+<div id="deleteModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:30px; border-radius:12px; width:350px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <h3>Delete Contact?</h3>
+        <p style="color:#555; margin-bottom:20px;">Are you sure you want to delete this contact submission permanently?</p>
+        <button onclick="confirmDelete()" style="background:#dc3545;color:white;border:none;padding:10px 20px;border-radius:6px;">Delete</button>
+        <button onclick="closeDeleteModal()" style="background:#6c757d;color:white;border:none;padding:10px 20px;border-radius:6px;">Cancel</button>
+    </div>
+</div>
 @endsection
 @push('scripts')
 <script>
@@ -151,6 +175,22 @@ function openContactModal(id) {
 
 function closeContactModal() {
     document.getElementById('contactModal').classList.add('hidden');
+}
+let deleteId = null;
+
+function openDeleteModal(id) {
+    deleteId = id;
+    document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
+
+function confirmDelete() {
+    if(deleteId){
+        document.getElementById('del-' + deleteId).submit();
+    }
 }
 </script>
 @endpush

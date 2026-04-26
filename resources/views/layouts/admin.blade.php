@@ -1,171 +1,138 @@
 <x-app-layout>
-   
-    <div class="bg-black min-h-screen">
-
-        <!-- SIDEBAR (FIXED, NEVER SQUEEZES) -->
-        <aside class="fixed top-0 left-0 w-64 h-screen
-                      bg-black text-white
-                      flex flex-col
-                      border-r border-gray-800
-                      z-40">
-
-            <!-- Brand -->
-            <div class="px-6 py-5 border-b border-gray-800">
-                <h1 class="text-xl font-bold tracking-wide">
-                    <span class="text-white">GLOBAL</span>
-                    <span class="text-yellow-500">TUITIONS</span>
-                </h1>
+    <div class="admin-wrap min-h-screen flex">
+        <!-- Sidebar: Imperial Tuitions branding (teal) -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-brand">
+                <span class="admin-brand-main">Imperial</span>
+                <span class="admin-brand-accent">Tuitions</span>
             </div>
 
-            <!-- Menu -->
-            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-
-                <!-- Dashboard -->
+            <nav class="admin-nav">
                 <a href="{{ route('dashboard') }}"
-                   class="flex items-center px-4 py-3 rounded-md
-                   {{ request()->routeIs('dashboard')
-                        ? 'bg-yellow-500 text-black font-semibold'
-                        : 'text-white hover:bg-white hover:text-black transition' }}">
+                   class="admin-nav-item {{ request()->routeIs('dashboard') ? 'admin-nav-item-active' : '' }}">
                     Dashboard
                 </a>
-                <div class="pt-4 text-xs uppercase tracking-wider text-gray-500">
-                    Your Courses
-                </div>
-
-                <!-- Courses -->
+                <div class="admin-nav-label">Your Courses</div>
                 <a href="{{ route('admin.courses.index') }}"
-                   class="flex items-center px-4 py-3 rounded-md
-                   {{ request()->routeIs('admin.courses.*')
-                        ? 'bg-yellow-500 text-black font-semibold'
-                        : 'text-white hover:bg-white hover:text-black transition' }}">
+                   class="admin-nav-item {{ request()->routeIs('admin.courses.index') ? 'admin-nav-item-active' : '' }}">
                     Manage Courses
                 </a>
                 <a href="{{ route('admin.courses.popular') }}"
-   class="flex items-center px-4 py-3 rounded-md
-   {{ request()->routeIs('admin.courses.popular')
-        ? 'bg-yellow-500 text-black font-semibold'
-        : 'text-white hover:bg-white hover:text-black transition' }}">
-    Popular Courses
-</a>
+                   class="admin-nav-item {{ request()->routeIs('admin.courses.popular') ? 'admin-nav-item-active' : '' }}">
+                    Popular Courses
+                </a>
                 <a href="{{ route('admin.course-launches.index') }}"
-   class="flex items-center px-4 py-3 rounded-md
-   {{ request()->routeIs('admin.course-launches.*')
-        ? 'bg-yellow-500 text-black font-semibold'
-        : 'text-white hover:bg-white hover:text-black transition' }}">
-     Launch Free Courses
-</a>
+                   class="admin-nav-item {{ request()->routeIs('admin.course-launches.*') ? 'admin-nav-item-active' : '' }}">
+                    Launch Free Courses
+                </a>
+                <a href="{{ route('training.index') }}"
+                   class="admin-nav-item {{ request()->routeIs('training.*') ? 'admin-nav-item-active' : '' }}">
+                    Training gallery
+                </a>
 
-                <a href="{{ route('training.categories.index') }}"
-   class="flex items-center px-4 py-3 rounded-md
-   {{ request()->routeIs('training.categories.*')
-        ? 'bg-yellow-500 text-black font-semibold'
-        : 'text-white hover:bg-white hover:text-black transition' }}">
-    Categories
-</a>
-
-
-                <!-- Divider -->
-                <!-- <div class="pt-4 text-xs uppercase tracking-wider text-gray-500">
-                    Training Section
-                </div> -->
-
-                <!-- Training Manager -->
-                <!-- <a href="{{ route('training.index') }}"
-                   class="flex items-center px-4 py-3 rounded-md
-                   {{ request()->routeIs('training.index')
-                        ? 'bg-yellow-500 text-black font-semibold'
-                        : 'text-white hover:bg-white hover:text-black transition' }}">
-                    Training Moments
-                </a> -->
-                <!-- Divider -->
-                <div class="pt-4 text-xs uppercase tracking-wider text-gray-500">
-                    Enrollments & Inquiries
-                </div>
-
-                <!-- Course Enrollments -->
+                <div class="admin-nav-label">Enrollments & Inquiries</div>
                 <a href="{{ route('admin.course-enrollments.index') }}"
-                   class="flex items-center px-4 py-3 rounded-md
-                   {{ request()->routeIs('admin.course-enrollments.*')
-                        ? 'bg-yellow-500 text-black font-semibold'
-                        : 'text-white hover:bg-white hover:text-black transition' }}">
+                   class="admin-nav-item {{ request()->routeIs('admin.course-enrollments.*') ? 'admin-nav-item-active' : '' }}">
                     Course Enrollments
                     @if($pendingEnrollmentsCount > 0)
-        <span class="ml-auto bg-yellow-500 text-black text-xs font-bold
-                     rounded-full px-2 py-0.5">
-            {{ $pendingEnrollmentsCount }}
-        </span>
-    @endif
+                        <span class="admin-nav-badge">{{ $pendingEnrollmentsCount }}</span>
+                    @endif
                 </a>
                 <a href="{{ route('admin.course-inquiries.index') }}"
-   class="flex items-center px-4 py-3 rounded-md
-   {{ request()->routeIs('admin.course-inquiries.*')
-        ? 'bg-yellow-500 text-black font-semibold'
-        : 'text-white hover:bg-white hover:text-black transition' }}">
-    Course Inquiries
-     @if($pendingInquiriesCount > 0)
-        <span class="ml-auto bg-yellow-500 text-black text-xs font-bold
-                     rounded-full px-2 py-0.5">
-            {{ $pendingInquiriesCount }}
-        </span>
-    @endif
-</a>
-<div class="pt-4 text-xs uppercase tracking-wider text-gray-500">
-                    Contact Us
-                </div>
+                   class="admin-nav-item {{ request()->routeIs('admin.course-inquiries.*') ? 'admin-nav-item-active' : '' }}">
+                    Course Inquiries
+                    @if($pendingInquiriesCount > 0)
+                        <span class="admin-nav-badge">{{ $pendingInquiriesCount }}</span>
+                    @endif
+                </a>
 
-                <!-- Contact Leads -->
-<a href="{{ route('admin.contacts.index') }}"
-   class="flex items-center px-4 py-3 rounded-md
-   {{ request()->routeIs('admin.contacts.*')
-        ? 'bg-yellow-500 text-black font-semibold'
-        : 'text-white hover:bg-white hover:text-black transition' }}">
-    Contact Leads
-     @if($pendingContactsCount > 0)
-        <span class="ml-auto bg-yellow-500 text-black text-xs font-bold
-                     rounded-full px-2 py-0.5">
-            {{ $pendingContactsCount }}
-        </span>
-    @endif
-</a>
-<div class="pt-4 text-xs uppercase tracking-wider text-gray-500">
-    Newsletter
-</div>
-
-<a href="{{ route('admin.subscribers.index') }}"
-   class="flex items-center px-4 py-3 rounded-md
-   {{ request()->routeIs('admin.subscribers.*')
-        ? 'bg-yellow-500 text-black font-semibold'
-        : 'text-white hover:bg-white hover:text-black transition' }}">
-    Subscribers
-</a>
-
-
-
+                <div class="admin-nav-label">Contact Us</div>
+                <a href="{{ route('admin.contacts.index') }}"
+                   class="admin-nav-item {{ request()->routeIs('admin.contacts.*') ? 'admin-nav-item-active' : '' }}">
+                    Contact Leads
+                    @if($pendingContactsCount > 0)
+                        <span class="admin-nav-badge">{{ $pendingContactsCount }}</span>
+                    @endif
+                </a>
+                <div class="admin-nav-label">Newsletter</div>
+                <a href="{{ route('admin.subscribers.index') }}"
+                   class="admin-nav-item {{ request()->routeIs('admin.subscribers.*') ? 'admin-nav-item-active' : '' }}">
+                    Subscribers
+                </a>
             </nav>
 
-            <!-- Footer -->
-            <div class="px-6 py-4 border-t border-gray-800 text-sm text-gray-500">
-                © {{ date('Y') }}  Imperial Tuitions
+            <div class="admin-sidebar-footer">
+                © {{ date('Y') }} Imperial Tuitions
             </div>
         </aside>
 
-        <!-- MAIN CONTENT (SHIFTED RIGHT) -->
-        <main class="ml-64 min-h-screen bg-black text-white">
-
-            <!-- Header -->
-            <div class="border-b border-gray-800 px-6 py-4 sticky top-0 bg-black z-30">
-                <h2 class="text-xl font-semibold">
-                    {{ $title ?? '' }}
-                </h2>
-            </div>
-
-            <!-- Page Content -->
-            <div class="p-6">
+        <!-- Main content: light, clean -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1 class="admin-header-title">{{ $title ?? 'Admin' }}</h1>
+            </header>
+            <div class="admin-content">
                 @yield('content')
                 @stack('scripts')
             </div>
-
         </main>
-
     </div>
+
+    <style>
+        .admin-wrap { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 16px; }
+        .admin-sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #09515D 0%, #0a6573 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            box-shadow: 4px 0 24px rgba(9, 81, 93, 0.2);
+        }
+        .admin-sidebar-brand {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+        .admin-brand-main { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+        .admin-brand-accent { font-size: 20px; font-weight: 800; color: #F47B1E; letter-spacing: -0.02em; margin-left: 2px; }
+        .admin-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+        .admin-nav-label {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.6); margin: 20px 12px 8px; padding-left: 4px;
+        }
+        .admin-nav-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 16px; margin-bottom: 4px;
+            border-radius: 10px;
+            color: rgba(255,255,255,0.95);
+            text-decoration: none;
+            font-weight: 600; font-size: 15px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .admin-nav-item:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .admin-nav-item-active { background: #F47B1E; color: #0f172a; }
+        .admin-nav-item-active:hover { background: #f59e0b; color: #0f172a; }
+        .admin-nav-badge {
+            margin-left: auto;
+            background: #F47B1E; color: #0f172a;
+            font-size: 12px; font-weight: 700;
+            padding: 2px 8px; border-radius: 999px;
+        }
+        .admin-nav-item-active .admin-nav-badge { background: #0f172a; color: #F47B1E; }
+        .admin-sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            font-size: 12px; color: rgba(255,255,255,0.7);
+        }
+        .admin-main { flex: 1; min-height: 100vh; background: #f1f5f9; display: flex; flex-direction: column; }
+        .admin-header {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .admin-header-title { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0; }
+        .admin-content { padding: 28px; flex: 1; }
+    </style>
 </x-app-layout>

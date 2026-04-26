@@ -21,7 +21,7 @@
             <li><a href="#trust">Why Choose Us</a></li>
             <li><a href="#testimonials">Testimonials</a></li>
 <li>
-    <a href="javascript:void(0)" onclick="openContactModal()">Contact Us</a>
+    <a href="javascript:void(0)" onclick="openContactModal()">Get Notified</a>
 </li>
         </ul>
 

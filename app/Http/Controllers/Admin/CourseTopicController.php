@@ -16,30 +16,37 @@ class CourseTopicController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.courses.topics.index', compact('course', 'topics'));
+        return view('admin.courses.topics.index', compact('course', 'topics'))->with('title', 'Manage Topics');
     }
 
     // Store new topic
-    public function store(Request $request, Course $course)
-    {
-        $request->validate([
-            'title'      => 'required|string|max:255',
-            'description'=> 'nullable|string',
-            'sort_order' => 'required|integer',
-        ]);
+ public function store(Request $request, Course $course)
+{
+    $request->validate([
+        'title'      => 'required|string|max:255',
+        'description'=> 'nullable|string',
+        'sort_order' => 'nullable|integer',
+    ]);
 
-        $course->topics()->create([
-            'title'      => $request->title,
-            'description'=> $request->description,
-            'sort_order' => $request->sort_order,
-            'is_active'  => $request->has('is_active'),
-        ]);
-
-        return redirect()
-            ->route('admin.courses.topics', $course)
-            ->with('success', 'Topic added successfully');
+    // ✅ Auto-generate sort_order per course
+    if (!$request->sort_order) {
+        $lastSortOrder = $course->topics()->max('sort_order'); // current course ka max
+        $sortOrder = $lastSortOrder ? $lastSortOrder + 10 : 10;
+    } else {
+        $sortOrder = $request->sort_order;
     }
 
+    $course->topics()->create([
+        'title'      => $request->title,
+        'description'=> $request->description,
+        'sort_order' => $sortOrder,
+        'is_active'  => $request->has('is_active'),
+    ]);
+
+    return redirect()
+        ->route('admin.courses.topics', $course)
+        ->with('success', 'Topic added successfully');
+}
     // Edit topic page
     public function edit(CourseTopic $topic)
     {

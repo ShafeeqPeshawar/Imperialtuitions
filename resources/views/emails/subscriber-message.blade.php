@@ -1,15 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-</head>
-<body style="font-family: Arial, sans-serif; background:#f5f5f5; padding:20px;">
-    <div style="max-width:600px; margin:auto; background:#ffffff; padding:20px;">
-        {!! $content !!}
-        <hr>
-        <p style="font-size:12px; color:#777;">
-            © {{ date('Y') }} BTMG Trainings
-        </p>
+@extends('emails.layout')
+
+@section('header_title', 'Thank You for Subscribing!')
+@section('header_subtitle', 'You will now receive updates from Imperial Tuitions.')
+
+@section('body')
+    <p>Dear {{ $name }},</p>
+    <p>We are excited to keep you informed about our latest courses and offers.</p>
+
+    <!-- Subscriber Message Box -->
+    <div class="email-message-box">
+        <div class="email-message-label"> Message</div>
+        <div class="email-message-content" style="white-space: pre-line;">
+            {{ nl2br(strip_tags($content)) }}
+        </div>
     </div>
-</body>
-</html>
+
+    <p class="email-signature">
+        Kind regards,<br>
+        <strong>Imperial Tuitions Team</strong>
+    </p>
+@endsection

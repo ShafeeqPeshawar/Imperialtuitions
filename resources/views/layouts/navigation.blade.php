@@ -27,6 +27,7 @@
 
             <!-- Right -->
             <div class="hidden sm:flex sm:items-center">
+                @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="flex items-center gap-2 px-3 py-2 rounded-md
@@ -62,6 +63,12 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
+                @else
+                    <a href="{{ route('login') }}"
+                       class="text-sm font-medium text-gray-300 hover:text-yellow-400 px-3 py-2">
+                        Log in
+                    </a>
+                @endauth
             </div>
 
             <!-- Hamburger -->
@@ -94,6 +101,7 @@
         </div>
 
         <div class="border-t border-gray-800 px-4 py-4">
+            @auth
             <div class="text-sm text-white font-medium">{{ Auth::user()->name }}</div>
             <div class="text-xs text-gray-400">{{ Auth::user()->email }}</div>
 
@@ -111,6 +119,12 @@
                     </button>
                 </form>
             </div>
+            @else
+            <a href="{{ route('login') }}"
+               class="block text-gray-300 hover:text-yellow-400">
+                Log in
+            </a>
+            @endauth
         </div>
     </div>
 </nav>

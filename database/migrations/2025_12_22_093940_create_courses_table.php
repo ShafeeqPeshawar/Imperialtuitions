@@ -17,6 +17,7 @@ return new class extends Migration
         $table->string('image'); // co1.png, co2.png etc
         $table->boolean('is_active')->default(true);
         $table->timestamps();
+        
     });
 }
 

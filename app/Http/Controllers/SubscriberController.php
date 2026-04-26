@@ -18,16 +18,25 @@ class SubscriberController extends Controller
 public function store(Request $request)
 {
     $request->validate([
-        'email' => 'required|email|unique:subscribers,email'
+        'email' => 'required|email',
+        'name' => 'required|string', // ← add this
     ]);
+
+    $exists = Subscriber::where('email', $request->email)->exists();
+
+    if ($exists) {
+        return response()->json([
+            'message' => 'Already subscribed'
+        ], 409);
+    }
 
     $subscriber = Subscriber::create([
-        'email' => $request->email
+        'email' => $request->email,
+        'name' => $request->name, // ← save name
     ]);
 
-    // Send welcome email
     Mail::to($subscriber->email)->send(
-        new SubscriberWelcomeMail($subscriber->email)
+        new SubscriberWelcomeMail($subscriber->name)
     );
 
     return response()->json([
@@ -35,7 +44,6 @@ public function store(Request $request)
         'message' => 'Subscribed successfully. Please check your email.'
     ]);
 }
-
 
     public function index()
     {
@@ -47,14 +55,27 @@ public function sendMessage(Request $request)
 {
     $request->validate([
         'emails' => 'required|array',
-        'message' => 'required'
+        'message' => 'required|string'
     ]);
 
-    foreach ($request->emails as $email) {
-        Mail::to($email)->send(
-            new SubscriberBroadcastMail($request->message)
+    // Get subscribers from DB
+ // Get subscribers from DB
+$subscribers = Subscriber::whereIn('email', $request->emails)->get();
+
+// Loop through each subscriber and send broadcast email
+foreach ($subscribers as $subscriber) {
+    $name = $subscriber->name ?? 'Subscriber'; // fallback if name is null
+    $content = $request->message;              // message content
+
+    try {
+        Mail::to($subscriber->email)->send(
+            new SubscriberBroadcastMail($name, $content)
         );
+    } catch (\Exception $e) {
+        // Optional: log failed email sending
+        \Log::error("Failed to send email to {$subscriber->email}: " . $e->getMessage());
     }
+}
 
     return response()->json([
         'message' => 'Message sent successfully'

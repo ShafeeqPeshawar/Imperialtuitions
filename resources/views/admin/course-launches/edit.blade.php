@@ -4,7 +4,7 @@
 
 <div class="max-w-xl">
 
-    <h2 class="text-2xl font-semibold text-white mb-6">
+    <h2 class="text-2xl font-semibold text-black mb-6">
         Edit Course Launch Date
     </h2>
 

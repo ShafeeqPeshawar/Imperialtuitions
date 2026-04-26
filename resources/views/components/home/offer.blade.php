@@ -28,6 +28,14 @@
                     <h4>Hands-on & Personalized Learning</h4>
                     <p>Benefit from practical training, individual attention, and flexible scheduling options.</p>
                 </div>
+                <div class="offer-item"> <i class="fas fa-cloud"></i>
+                    <h4>Cloud & DevOps</h4>
+                    <p>Deploy and manage applications in the cloud with modern DevOps practices and tools.</p>
+                </div>
+                <div class="offer-item"> <i class="fas fa-shield-alt"></i>
+                    <h4>Cybersecurity & IT Security</h4>
+                    <p>Learn to protect systems and data with security best practices and defensive techniques.</p>
+                </div>
             </div> <button class="btn-primary" onclick="scrollToCourses()">Explore Courses</button>
         </div>
     </section> 

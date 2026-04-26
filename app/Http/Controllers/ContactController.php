@@ -11,45 +11,33 @@ class ContactController extends Controller
     /* =========================
        FRONTEND: STORE CONTACT
     ========================== */
-   public function store(Request $request)
-{
-    $request->validate([
-        'name'    => 'required|string|max:255',
-        'email'   => 'required|email',
-        'message' => 'required|string',
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'    => 'required|string|max:255',
+            'email'   => 'required|email',
+            'message' => 'required|string',
+        ]);
 
-    $contact = Contact::create([
-        'name'         => $request->name,
-        'email'        => $request->email,
-        'phone'        => $request->phone,
-        'message'      => $request->message,
-        'reply_status' => 'pending',
-        'is_viewed'    => false,
-    ]);
+        $contact = Contact::create([
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'phone'        => $request->phone,
+            'message'      => $request->message,
+            'reply_status' => 'pending',
+            'is_viewed'    => false,
+        ]);
 
-    // ✅ AUTO-REPLY EMAIL TO USER
-    Mail::raw(
-        "Dear {$contact->name},\n\n" .
-        "Thank you for contacting  Imperial Tuitions Training.\n\n" .
-        "We’ve received your message and one of our training coordinators will reach out to you shortly to understand how we can best assist you — including course details, levels, schedules, and delivery options.\n\n" .
-        "If your inquiry is related to a specific course, feel free to reply to this email with the course name and any additional information.\n\n" .
-        "Best regards,\n" .
-        " Imperial Tuitions Training Team\n" .
-        "Professional IT & Business Training",
-        function ($mail) use ($contact) {
+        Mail::send('emails.contact-received', ['contact' => $contact], function ($mail) use ($contact) {
             $mail->to($contact->email)
-                 ->subject('Thanks for contacting  Imperial Tuitions');
-        }
-    );
+                 ->subject('Imperial Tuitions – Message Received');
+        });
 
-    return back()->with(
-    'contact_success',
-    'Thank you for contacting us. We will reach out to you shortly.'
-);
-
-}
-
+        return back()->with(
+            'contact_success',
+            'Thank you for contacting us. We will reach out to you shortly.'
+        );
+    }
 
     /* =========================
        ADMIN: LIST CONTACTS
@@ -78,22 +66,20 @@ class ContactController extends Controller
         ]);
     }
 
-    /* =========================
-       ADMIN: REPLY TO CONTACT
-    ========================== */
     public function reply(Request $request, Contact $contact)
     {
         $request->validate([
             'reply_message' => 'required|string',
         ]);
 
-        // Send email
-        Mail::raw($request->reply_message, function ($mail) use ($contact) {
+        Mail::send('emails.contact-reply', [
+            'contact' => $contact,
+            'replyMessage' => $request->reply_message,
+        ], function ($mail) use ($contact) {
             $mail->to($contact->email)
-                 ->subject('Reply from BTMG Trainings');
+                ->subject('Message Received – Imperial Tuitions');
         });
 
-        // Update status
         $contact->update([
             'reply_status' => 'replied',
         ]);
@@ -101,5 +87,14 @@ class ContactController extends Controller
         return redirect()
             ->route('admin.contacts.index')
             ->with('success', 'Reply sent successfully.');
+    }
+
+    public function destroy(Contact $contact)
+    {
+        $contact->delete();
+
+        return redirect()
+            ->route('admin.contacts.index')
+            ->with('success', 'Contact deleted successfully.');
     }
 }

@@ -1,9 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
- use App\Models\Subscriber;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\FreeCourseLaunchMail;
+
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseLaunch;
@@ -65,24 +63,16 @@ public function store(Request $request)
         'launch_date' => 'required|date',
     ]);
 
-    $launch = CourseLaunch::create([
+    CourseLaunch::create([
         'course_id'   => $request->course_id,
         'launch_date' => $request->launch_date,
     ]);
 
-    // 🔥 SEND EMAIL TO ALL SUBSCRIBERS
-    $course = $launch->course;
-    $subscribers = Subscriber::pluck('email');
-
-    foreach ($subscribers as $email) {
-        Mail::to($email)->send(
-            new FreeCourseLaunchMail($course, $launch->launch_date)
-        );
-    }
+    // Subscriber emails are sent by CourseLaunchObserver (queued) for free courses only.
 
     return redirect()
         ->route('admin.course-launches.index')
-        ->with('success', 'Launch date added and emails sent to subscribers.');
+        ->with('success', 'Launch date added. Subscribers will be notified (free courses only).');
 }
     public function edit(CourseLaunch $courseLaunch)
 {

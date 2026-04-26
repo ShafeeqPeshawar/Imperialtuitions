@@ -4,36 +4,36 @@
                 <div class="logo">
                     <h2> Imperial Tuitions</h2>
                 </div>
-                <nav class="main-nav" id="mainNav">
-                    <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#courses">Courses</a></li>
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </nav>
-                <div class="header-actions">
-
+                <div class="header-nav-group">
+                    <nav class="main-nav" id="mainNav">
+                        <ul>
+                            <li><a href="/#home">Home</a></li>
+                            <li><a href="/#courses">Courses</a></li>
+                            <li><a href="/#about">We Offer</a></li>
+                            <li><a href="/#contact">Get Notified</a></li>
+                        </ul>
+                    </nav>
+                    <div class="header-actions">
+{{--
     <div class="search-bar">
         <input type="text" placeholder="Search courses..." id="searchInput">
         <i class="fas fa-search"></i>
     </div>
-
+    --}}
+{{--
     <div class="header-btn-group">
         <button class="btn-outline">Sign In</button>
         <button class="btn-primary">Get Started</button>
     </div>
-
-    <button class="mobile-menu-toggle" id="mobileMenuToggle">
-        <i class="fas fa-bars"></i>
-    </button>
-
-</div>
-
+ --}}
+                        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </header> <!-- Hero Section -->
- </header>
+    </header>
 
 <div class="container">
   <div class="courses-grid" id="coursesGrid" style="display:none">

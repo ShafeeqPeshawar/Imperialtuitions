@@ -5,7 +5,7 @@
 <!-- Toast Container -->
 <div id="toast-container" class="fixed top-6 right-6 z-50 space-y-3"></div>
 
-<h2 class="text-2xl font-semibold mb-6 text-white">
+<h2 class="text-2xl font-semibold mb-6 text-black">
     Popular Courses
 </h2>
 
