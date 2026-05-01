@@ -35,7 +35,7 @@ export async function sendMail(input: {
   html: string;
 }) {
   const mailer = getTransporter();
-  if (!mailer) return;
+  if (!mailer) return false;
 
   await mailer.sendMail({
     from: env("MAIL_FROM_ADDRESS", env("MAIL_USERNAME")),
@@ -43,4 +43,9 @@ export async function sendMail(input: {
     subject: input.subject,
     html: input.html,
   });
+  return true;
+}
+
+export function isMailerConfigured() {
+  return hasMailerConfig;
 }

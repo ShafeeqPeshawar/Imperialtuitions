@@ -27,6 +27,7 @@ export function ContactHeroButton() {
       setMessage(body.message ?? (res.ok ? "Message sent." : "Unable to send message."));
       if (res.ok) {
         setData({ name: "", email: "", phone: "", message: "" });
+        setOpen(false);
       }
     } catch {
       setMessage("Unable to send message.");
@@ -43,13 +44,13 @@ export function ContactHeroButton() {
 
       {open && (
         <div id="contactModal" className="modal-overlay" style={{ display: "flex" }}>
-          <div className="modal-box">
+          <div className="modal-box contact-hero-modal-box">
             <button className="close-btn" type="button" onClick={() => setOpen(false)}>×</button>
             <div className="registration-card">
               <h2 className="reg-title">Contact Us</h2>
               <p className="reg-subtitle">Leave us a message and our team will respond shortly.</p>
               <form onSubmit={submit}>
-                <div className="reg-grid">
+                <div className="reg-grid contact-hero-reg-grid">
                   <div className="reg-group">
                     <label>Full Name</label>
                     <input
@@ -77,7 +78,6 @@ export function ContactHeroButton() {
                       onChange={(e) => setData((prev) => ({ ...prev, phone: e.target.value }))}
                     />
                   </div>
-                  <div />
                   <div className="reg-group full">
                     <label>Message</label>
                     <textarea

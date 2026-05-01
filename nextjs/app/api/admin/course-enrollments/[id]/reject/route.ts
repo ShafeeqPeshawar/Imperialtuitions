@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { sendMail } from "@/lib/mailer";
+import { enrollmentRejectedEmail } from "@/lib/email-templates";
 
 type TargetRow = { name: string; email: string; course_name: string };
 
@@ -23,7 +24,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
     await sendMail({
       to: row.email,
       subject: "Imperial Tuitions Training - Enrollment Update",
-      html: `<p>Dear ${row.name},</p><p>We reviewed your enrollment for <strong>${row.course_name}</strong> and it was not approved this time.</p>`,
+      html: enrollmentRejectedEmail(row.name, row.course_name),
     });
   }
   return NextResponse.json({ success: true, message: "Enrollment rejected." });

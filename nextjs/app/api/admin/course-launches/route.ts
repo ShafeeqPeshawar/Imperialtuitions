@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { sendMail } from "@/lib/mailer";
+import { freeCourseLaunchEmail } from "@/lib/email-templates";
 
 type LaunchRow = {
   id: number;
@@ -51,6 +53,27 @@ export async function POST(request: Request) {
     courseId,
     launchDate,
   ]);
+
+  const courseInfo = await dbQuery<Array<{ id: number; title: string }>>(
+    "SELECT id, title FROM courses WHERE id = ? LIMIT 1",
+    [courseId]
+  );
+  const title = courseInfo[0]?.title ?? "Free Course";
+  const appUrl = process.env.APP_URL_NEXT || "http://localhost:3000";
+  const courseUrl = `${appUrl}/courses/${courseId}`;
+  const subscribers = await dbQuery<Array<{ email: string }>>(
+    "SELECT email FROM subscribers WHERE email IS NOT NULL AND email <> ''"
+  );
+
+  await Promise.all(
+    subscribers.map((subscriber) =>
+      sendMail({
+        to: subscriber.email,
+        subject: "New FREE Course Launched!",
+        html: freeCourseLaunchEmail(title, launchDate, courseUrl),
+      })
+    )
+  );
 
   return NextResponse.json({ success: true, message: "Launch date added." });
 }

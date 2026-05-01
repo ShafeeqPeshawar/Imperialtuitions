@@ -162,8 +162,17 @@ export function CourseDetailsClient({ course, relatedCourses }: Props) {
           ...inquiryData,
         }),
       });
-      const data = (await res.json()) as { popup_message?: string; message?: string };
+      const data = (await res.json()) as { success?: boolean; popup_message?: string; message?: string };
       setStatus(data.popup_message ?? data.message ?? (res.ok ? "Inquiry sent." : "Unable to send inquiry."));
+      if (res.ok && data.success) {
+        setInquiryOpen(false);
+        setInquiryData((prev) => ({
+          ...prev,
+          name: "",
+          email: "",
+          phone: "",
+        }));
+      }
     } catch {
       setStatus("Unable to send inquiry.");
     } finally {
@@ -188,6 +197,9 @@ export function CourseDetailsClient({ course, relatedCourses }: Props) {
       });
       const data = (await res.json()) as { popup_message?: string; message?: string };
       setStatus(data.popup_message ?? data.message ?? (res.ok ? "Enrollment submitted." : "Unable to submit enrollment."));
+      if (res.ok) {
+        setEnrollOpen(false);
+      }
     } catch {
       setStatus("Unable to submit enrollment.");
     } finally {

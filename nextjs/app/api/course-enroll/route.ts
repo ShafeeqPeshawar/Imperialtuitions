@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
 import { sendMail } from "@/lib/mailer";
+import { enrollmentReceivedEmail } from "@/lib/email-templates";
 import { courseEnrollmentSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
@@ -50,8 +51,8 @@ export async function POST(request: Request) {
 
     await sendMail({
       to: data.email,
-      subject: "Imperial Tuitions - Enrollment Submitted",
-      html: `<p>Hi ${data.name},</p><p>Thank you for enrolling in <strong>${data.course_name}</strong>. An Imperial Tuitions coordinator will contact you shortly.</p>`,
+      subject: "Imperial Tuitions - Registration Received",
+      html: enrollmentReceivedEmail(data.name, data.course_name, data.level ?? null, data.message ?? null),
     });
 
     return NextResponse.json({

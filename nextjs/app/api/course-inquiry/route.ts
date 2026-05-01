@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { sendMail } from "@/lib/mailer";
+import { isMailerConfigured, sendMail } from "@/lib/mailer";
+import { inquiryReceivedEmail } from "@/lib/email-templates";
 import { courseInquirySchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
@@ -46,17 +47,44 @@ export async function POST(request: Request) {
       ]
     )) as unknown as { insertId: number };
 
-    await sendMail({
-      to: data.email,
-      subject: "Imperial Tuitions - Inquiry Received",
-      html: `<p>Hi ${data.name},</p><p>Your inquiry for <strong>${data.course_title}</strong> has been received. Our team will respond within 24 hours.</p>`,
-    });
+    const mailConfigured = isMailerConfigured();
+    if (!mailConfigured) {
+      return NextResponse.json(
+        {
+          success: false,
+          id: result.insertId,
+          message:
+            "Inquiry saved, but email service is not configured. Set MAIL_PASSWORD in nextjs/.env and restart dev server.",
+        },
+        { status: 503 }
+      );
+    }
+
+    try {
+      await sendMail({
+        to: data.email,
+        subject: "Imperial Tuitions - Inquiry Received",
+        html: inquiryReceivedEmail(data.name, data.course_title, data.level ?? null, data.message),
+      });
+    } catch (mailError) {
+      console.error("Inquiry mail send error:", mailError);
+      return NextResponse.json(
+        {
+          success: false,
+          id: result.insertId,
+          message: "Inquiry saved, but failed to send email copy. Check Gmail App Password and SMTP settings.",
+        },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
       id: result.insertId,
       popup_title: "Inquiry Sent",
-      popup_message: "Your inquiry has been received. Our team will respond within 24 hours.",
+      popup_message: "Your inquiry has been received. A copy has been emailed to you.",
+      mail_sent: true,
+      mail_configured: true,
     });
   } catch (error) {
     console.error("Course inquiry API error:", error);

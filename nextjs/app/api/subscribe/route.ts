@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
 import { sendMail } from "@/lib/mailer";
+import { subscriberWelcomeEmail } from "@/lib/email-templates";
 import { subscribeSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     await sendMail({
       to: email,
       subject: "Welcome to Imperial Tuitions",
-      html: `<p>Hi ${name},</p><p>Thank you for subscribing to Imperial Tuitions updates.</p>`,
+      html: subscriberWelcomeEmail(name),
     });
 
     return NextResponse.json({

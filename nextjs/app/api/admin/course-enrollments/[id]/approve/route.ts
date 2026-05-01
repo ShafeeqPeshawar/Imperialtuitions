@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { sendMail } from "@/lib/mailer";
+import { enrollmentApprovedEmail } from "@/lib/email-templates";
 
-type TargetRow = { name: string; email: string; course_name: string };
+type TargetRow = { name: string; email: string; course_name: string; level: string | null };
 
 async function ensureAuth() {
   const user = await getCurrentUser();
@@ -17,13 +18,13 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
   const { id } = await params;
 
   await dbQuery("UPDATE course_enrollments SET status = 'approved', updated_at = NOW() WHERE id = ?", [id]);
-  const rows = await dbQuery<TargetRow[]>("SELECT name, email, course_name FROM course_enrollments WHERE id = ? LIMIT 1", [id]);
+  const rows = await dbQuery<TargetRow[]>("SELECT name, email, course_name, level FROM course_enrollments WHERE id = ? LIMIT 1", [id]);
   const row = rows[0];
   if (row?.email) {
     await sendMail({
       to: row.email,
       subject: "Imperial Tuitions Training - Enrollment Approved",
-      html: `<p>Dear ${row.name},</p><p>Your enrollment for <strong>${row.course_name}</strong> has been approved.</p>`,
+      html: enrollmentApprovedEmail(row.name, row.course_name, row.level),
     });
   }
   return NextResponse.json({ success: true, message: "Enrollment approved." });

@@ -126,6 +126,13 @@ export function CourseBrowser({ initialCourses, categories, catalogLoadError }: 
       const data = (await res.json()) as { success?: boolean; popup_message?: string; message?: string };
       if (res.ok && data.success) {
         setInquiryMsg(data.popup_message ?? "Inquiry sent.");
+        setInquiryOpen(false);
+        setInquiryData((prev) => ({
+          ...prev,
+          name: "",
+          email: "",
+          phone: "",
+        }));
         return;
       }
       setInquiryMsg(data.message ?? "Unable to submit inquiry.");
@@ -178,6 +185,7 @@ export function CourseBrowser({ initialCourses, categories, catalogLoadError }: 
       const data = (await res.json()) as { success?: boolean; popup_message?: string; message?: string };
       setEnrollMsg(data.popup_message ?? data.message ?? (res.ok ? "Enrollment sent." : "Unable to enroll."));
       if (res.ok) {
+        setEnrollOpen(false);
         setEnrollData({
           name: "",
           email: "",
@@ -367,7 +375,7 @@ export function CourseBrowser({ initialCourses, categories, catalogLoadError }: 
 
       {contactOpen && (
         <div className="modal-overlay inquiry-modal-overlay" style={{ display: "flex" }}>
-          <div className="inquiry-modal-box">
+          <div className="inquiry-modal-box contact-modal-box">
             <div className="inquiry-modal-header">
               <h3 className="inquiry-modal-title">Contact Us</h3>
               <p className="inquiry-modal-subtitle">Share your query and we&apos;ll get back soon.</p>
@@ -377,7 +385,7 @@ export function CourseBrowser({ initialCourses, categories, catalogLoadError }: 
             </div>
             <div className="inquiry-modal-body">
               <form onSubmit={submitContact} className="inquiry-form">
-                <div className="inquiry-form-grid">
+                <div className="inquiry-form-grid contact-form-grid">
                   <div className="inquiry-field">
                     <label>Full Name</label>
                     <input

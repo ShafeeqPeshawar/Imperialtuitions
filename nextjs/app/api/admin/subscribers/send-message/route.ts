@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     subscribers.map((s) =>
       sendMail({
         to: s.email,
-        subject: "Imperial Tuitions Newsletter",
+        subject: "Message from Imperial Tuitions",
         html: subscriberBroadcastEmail("Subscriber", message),
       })
     )

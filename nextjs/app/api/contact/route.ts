@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
 import { sendMail } from "@/lib/mailer";
+import { contactReceivedEmail } from "@/lib/email-templates";
 import { contactSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
     await sendMail({
       to: email,
       subject: "Imperial Tuitions - Message Received",
-      html: `<p>Hi ${name},</p><p>Thank you for contacting Imperial Tuitions. We will reach out shortly.</p>`,
+      html: contactReceivedEmail(name, message),
     });
 
     return NextResponse.json({
