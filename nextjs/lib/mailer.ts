@@ -37,8 +37,15 @@ export async function sendMail(input: {
   const mailer = getTransporter();
   if (!mailer) return false;
 
+  const fromAddress = env("MAIL_FROM_ADDRESS", env("MAIL_USERNAME"));
+  /** Display name shown in recipients' mail clients ("From") */
+  const fromName = env("MAIL_FROM_NAME", "Imperial Tuitions");
+
   await mailer.sendMail({
-    from: env("MAIL_FROM_ADDRESS", env("MAIL_USERNAME")),
+    from: {
+      name: fromName,
+      address: fromAddress,
+    },
     to: input.to,
     subject: input.subject,
     html: input.html,

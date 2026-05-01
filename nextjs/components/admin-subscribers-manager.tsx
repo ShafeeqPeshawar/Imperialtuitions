@@ -46,8 +46,11 @@ export function AdminSubscribersManager({ initialSubscribers }: { initialSubscri
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emails: selectedEmails, message: mailHtml }),
     });
-    const body = (await res.json()) as { message?: string };
-    setMessage(body.message ?? (res.ok ? "Message sent successfully." : "Failed to send message."));
+    const body = (await res.json()) as { message?: string; sent?: number; attempted?: number };
+    setMessage(
+      body.message ??
+        (res.ok ? "Message sent successfully." : "Failed to send message.")
+    );
     if (res.ok) {
       setIsMessageOpen(false);
       setMailHtml("");
