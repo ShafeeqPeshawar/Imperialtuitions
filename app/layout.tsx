@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -40,10 +41,18 @@ export default function RootLayout({
               <h2>Imperial Tuitions</h2>
               <nav className="main-nav">
                 <ul>
-                  <li><a href="/#home">Home</a></li>
-                  <li><a href="/#courses">Courses</a></li>
-                  <li><a href="/#about">We Offer</a></li>
-                  <li><a href="/#contact">Get Notified</a></li>
+                  <li>
+                    <Link href="/#home">Home</Link>
+                  </li>
+                  <li>
+                    <Link href="/#courses">Courses</Link>
+                  </li>
+                  <li>
+                    <Link href="/#about">We Offer</Link>
+                  </li>
+                  <li>
+                    <Link href="/#contact">Get Notified</Link>
+                  </li>
                 </ul>
               </nav>
             </div>

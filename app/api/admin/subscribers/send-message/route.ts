@@ -1,16 +1,11 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 import { isMailerConfigured, sendMail } from "@/lib/mailer";
 import { subscriberBroadcastEmail } from "@/lib/email-templates";
 
 type SubscriberRow = { email: string };
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 function normalizeEmails(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
@@ -23,8 +18,8 @@ function normalizeEmails(raw: unknown): string[] {
 }
 
 export async function POST(request: Request) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
 
   if (!isMailerConfigured()) {
     return NextResponse.json(

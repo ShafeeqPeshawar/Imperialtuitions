@@ -11,6 +11,12 @@ function nl2brSafe(value: string) {
   return escapeHtml(value).replace(/\r?\n/g, "<br />");
 }
 
+function replyHighlightBlock(replyMessage: string) {
+  return `<div style="background:#f9f9f9;border-left:4px solid #fbbf24;padding:12px 16px;margin:16px 0;border-radius:4px;">
+       ${nl2brSafe(replyMessage)}
+     </div>`;
+}
+
 function wrapEmail(title: string, headerTitle: string, headerSubtitle: string, body: string) {
   return `
   <div style="font-family:Inter,Arial,sans-serif;background:#f8fafc;padding:24px;">
@@ -53,9 +59,7 @@ export function contactReplyEmail(name: string, replyMessage: string) {
     "Thank you for contacting Imperial Tuitions",
     `<p>Dear <strong>${escapeHtml(name)}</strong>,</p>
      <p>Thank you for contacting <strong>Imperial Tuitions</strong>.</p>
-     <div style="background:#f9f9f9;border-left:4px solid #fbbf24;padding:12px 16px;margin:16px 0;border-radius:4px;">
-       ${nl2brSafe(replyMessage)}
-     </div>
+     ${replyHighlightBlock(replyMessage)}
      <p>If you have further questions, reply to this email.</p>`
   );
 }
@@ -67,9 +71,7 @@ export function inquiryReplyEmail(name: string, courseTitle: string, replyMessag
     "Thank you for contacting Imperial Tuitions",
     `<p>Dear <strong>${escapeHtml(name)}</strong>,</p>
      <p>We received your inquiry regarding <strong>${escapeHtml(courseTitle)}</strong>.</p>
-     <div style="background:#f9f9f9;border-left:4px solid #fbbf24;padding:12px 16px;margin:16px 0;border-radius:4px;">
-       ${nl2brSafe(replyMessage)}
-     </div>
+     ${replyHighlightBlock(replyMessage)}
      <p>If you have any further questions, reply to this email.</p>`
   );
 }

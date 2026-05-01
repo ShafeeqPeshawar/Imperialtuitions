@@ -1,31 +1,12 @@
 import { NextResponse } from "next/server";
-import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
-import { sendMail } from "@/lib/mailer";
-import { enrollmentRejectedEmail } from "@/lib/email-templates";
-
-type TargetRow = { name: string; email: string; course_name: string };
-
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
+import { applyEnrollmentDecision } from "@/lib/admin-enrollment-decision";
+import { requireUser } from "@/lib/api-auth";
 
 export async function POST(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const { id } = await params;
 
-  await dbQuery("UPDATE course_enrollments SET status = 'rejected', updated_at = NOW() WHERE id = ?", [id]);
-  const rows = await dbQuery<TargetRow[]>("SELECT name, email, course_name FROM course_enrollments WHERE id = ? LIMIT 1", [id]);
-  const row = rows[0];
-  if (row?.email) {
-    await sendMail({
-      to: row.email,
-      subject: "Imperial Tuitions Training - Enrollment Update",
-      html: enrollmentRejectedEmail(row.name, row.course_name),
-    });
-  }
-  return NextResponse.json({ success: true, message: "Enrollment rejected." });
+  const { message } = await applyEnrollmentDecision(id, "rejected");
+  return NextResponse.json({ success: true, message });
 }

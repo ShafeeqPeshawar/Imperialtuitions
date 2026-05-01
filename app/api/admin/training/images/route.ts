@@ -3,17 +3,12 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 export async function GET() {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const images = await dbQuery<Array<{ id: number; training_category_id: number; image: string }>>(
     "SELECT id, training_category_id, image FROM training_images ORDER BY id DESC"
   );
@@ -21,8 +16,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const form = await request.formData();
   const categoryId = Number(form.get("category_id") ?? 0);
   const image = form.get("image");

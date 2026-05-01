@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
 const schema = z.object({
   name: z.string().trim().min(1).max(255),
@@ -12,8 +12,8 @@ type ExistingRow = { id: number };
 
 export async function PATCH(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+    const auth = await requireUser();
+    if (!auth.ok) return auth.response;
 
     const body = await request.json();
     const parsed = schema.safeParse(body);
@@ -24,7 +24,7 @@ export async function PATCH(request: Request) {
     const email = parsed.data.email.trim().toLowerCase();
     const exists = await dbQuery<ExistingRow[]>(
       "SELECT id FROM users WHERE email = ? AND id != ? LIMIT 1",
-      [email, user.id]
+      [email, auth.user.id]
     );
     if (exists.length > 0) {
       return NextResponse.json({ success: false, message: "Email already taken." }, { status: 409 });
@@ -34,7 +34,7 @@ export async function PATCH(request: Request) {
       `UPDATE users
        SET name = ?, email = ?, email_verified_at = IF(email = ?, email_verified_at, NULL), updated_at = NOW()
        WHERE id = ?`,
-      [parsed.data.name, email, user.email, user.id]
+      [parsed.data.name, email, auth.user.email, auth.user.id]
     );
 
     return NextResponse.json({ success: true, message: "Profile updated." });

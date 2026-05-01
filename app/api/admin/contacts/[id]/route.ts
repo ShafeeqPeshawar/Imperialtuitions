@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
 type ContactRow = {
   id: number;
@@ -10,15 +10,10 @@ type ContactRow = {
   message: string;
 };
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const { id } = await params;
 
   await dbQuery("UPDATE contacts SET is_viewed = 1, updated_at = NOW() WHERE id = ?", [id]);
@@ -28,8 +23,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 }
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const { id } = await params;
   await dbQuery("DELETE FROM contacts WHERE id = ?", [id]);
   return NextResponse.json({ success: true, message: "Contact deleted successfully." });

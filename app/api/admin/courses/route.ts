@@ -3,7 +3,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
 type CourseRow = {
   id: number;
@@ -21,15 +21,10 @@ type CourseRow = {
   category_name: string | null;
 };
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 export async function GET() {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
 
   const courses = await dbQuery<CourseRow[]>(
     `SELECT c.id, c.title, c.description, c.image, c.level, c.duration, c.price, c.skills, c.sort_order, c.is_active, c.is_popular, c.training_category_id,
@@ -43,8 +38,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
 
   const form = await request.formData();
   const title = String(form.get("title") ?? "").trim();

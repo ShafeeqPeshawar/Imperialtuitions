@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { EnrollModal } from "@/components/enroll-modal";
 
 type Course = {
   id: number;
@@ -23,23 +22,20 @@ type Props = {
 };
 
 export function CourseBrowser({ initialCourses, categories, catalogLoadError }: Props) {
-  const courseList = Array.isArray(initialCourses) ? initialCourses : [];
-  const categoryList = Array.isArray(categories) ? categories : [];
+  const courseList = useMemo(
+    () => (Array.isArray(initialCourses) ? initialCourses : []),
+    [initialCourses]
+  );
+  const categoryList = useMemo(() => (Array.isArray(categories) ? categories : []), [categories]);
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLevel, setSelectedLevel] = useState("all");
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-  const [enrollOpen, setEnrollOpen] = useState(false);
   const [inquiryLoading, setInquiryLoading] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
-  const [enrollLoading, setEnrollLoading] = useState(false);
   const [inquiryMsg, setInquiryMsg] = useState("");
   const [contactMsg, setContactMsg] = useState("");
-  const [enrollMsg, setEnrollMsg] = useState("");
-  const [selectedCourseId, setSelectedCourseId] = useState("");
-  const [selectedCourseName, setSelectedCourseName] = useState("");
-  const [selectedCourseLevel, setSelectedCourseLevel] = useState("");
   const [inquiryData, setInquiryData] = useState({
     course_id: "",
     course_title: "",
@@ -53,14 +49,6 @@ export function CourseBrowser({ initialCourses, categories, catalogLoadError }: 
     name: "",
     email: "",
     phone: "",
-    message: "",
-  });
-  const [enrollData, setEnrollData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    preferred_date: "",
-    preferred_time: "",
     message: "",
   });
 
@@ -101,14 +89,6 @@ export function CourseBrowser({ initialCourses, categories, catalogLoadError }: 
       message: `I want to know more about ${course.title}.`,
     }));
     setInquiryOpen(true);
-  }
-
-  function openEnroll(course: Course) {
-    setEnrollMsg("");
-    setSelectedCourseId(String(course.id));
-    setSelectedCourseName(course.title);
-    setSelectedCourseLevel(course.level ?? "");
-    setEnrollOpen(true);
   }
 
   async function submitInquiry(event: FormEvent<HTMLFormElement>) {
@@ -163,42 +143,6 @@ export function CourseBrowser({ initialCourses, categories, catalogLoadError }: 
       setContactMsg("Unable to send message.");
     } finally {
       setContactLoading(false);
-    }
-  }
-
-  async function submitEnroll(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setEnrollLoading(true);
-    setEnrollMsg("");
-
-    try {
-      const res = await fetch("/api/course-enroll", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          course_id: selectedCourseId,
-          course_name: selectedCourseName,
-          level: selectedCourseLevel,
-          ...enrollData,
-        }),
-      });
-      const data = (await res.json()) as { success?: boolean; popup_message?: string; message?: string };
-      setEnrollMsg(data.popup_message ?? data.message ?? (res.ok ? "Enrollment sent." : "Unable to enroll."));
-      if (res.ok) {
-        setEnrollOpen(false);
-        setEnrollData({
-          name: "",
-          email: "",
-          phone: "",
-          preferred_date: "",
-          preferred_time: "",
-          message: "",
-        });
-      }
-    } catch {
-      setEnrollMsg("Unable to enroll.");
-    } finally {
-      setEnrollLoading(false);
     }
   }
 
@@ -360,18 +304,6 @@ export function CourseBrowser({ initialCourses, categories, catalogLoadError }: 
           </div>
         </div>
       )}
-
-      <EnrollModal
-        open={enrollOpen}
-        onClose={() => setEnrollOpen(false)}
-        courseTitle={selectedCourseName}
-        level={selectedCourseLevel}
-        loading={enrollLoading}
-        message={enrollMsg}
-        data={enrollData}
-        setData={setEnrollData}
-        onSubmit={submitEnroll}
-      />
 
       {contactOpen && (
         <div className="modal-overlay inquiry-modal-overlay" style={{ display: "flex" }}>

@@ -2,15 +2,16 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { dbQuery } from "@/lib/db";
-import { authCookieName, getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
+import { authCookieName } from "@/lib/auth";
 
 const schema = z.object({ password: z.string().min(1) });
 type PasswordRow = { password: string };
 
 export async function DELETE(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+    const auth = await requireUser();
+    if (!auth.ok) return auth.response;
 
     const body = await request.json();
     const parsed = schema.safeParse(body);
@@ -18,7 +19,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: "Password is required." }, { status: 422 });
     }
 
-    const rows = await dbQuery<PasswordRow[]>("SELECT password FROM users WHERE id = ? LIMIT 1", [user.id]);
+    const rows = await dbQuery<PasswordRow[]>("SELECT password FROM users WHERE id = ? LIMIT 1", [auth.user.id]);
     if (rows.length === 0) return NextResponse.json({ success: false, message: "User not found." }, { status: 404 });
 
     const ok = await bcrypt.compare(parsed.data.password, rows[0].password);
@@ -26,7 +27,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: "Password is incorrect." }, { status: 400 });
     }
 
-    await dbQuery("DELETE FROM users WHERE id = ?", [user.id]);
+    await dbQuery("DELETE FROM users WHERE id = ?", [auth.user.id]);
     const res = NextResponse.json({ success: true, message: "Account deleted." });
     res.cookies.set(authCookieName, "", {
       httpOnly: true,

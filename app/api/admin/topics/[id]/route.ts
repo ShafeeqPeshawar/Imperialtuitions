@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
 type TopicRow = {
   id: number;
@@ -11,15 +11,10 @@ type TopicRow = {
   is_active: number;
 };
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const { id } = await params;
   const rows = await dbQuery<TopicRow[]>(
     "SELECT id, course_id, title, description, sort_order, is_active FROM course_topics WHERE id = ? LIMIT 1",
@@ -30,8 +25,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 }
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const { id } = await params;
   const body = (await request.json()) as {
     title?: string;
@@ -56,8 +51,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const { id } = await params;
   await dbQuery("DELETE FROM course_topics WHERE id = ?", [id]);
   return NextResponse.json({ success: true, message: "Topic deleted successfully" });

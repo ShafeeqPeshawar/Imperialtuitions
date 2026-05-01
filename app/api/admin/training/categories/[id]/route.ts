@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
 function slugify(input: string) {
   return input
@@ -10,15 +10,10 @@ function slugify(input: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const { id } = await params;
   const body = (await request.json()) as { name?: string; sort_order?: number | null };
   const name = String(body.name ?? "").trim();
@@ -37,8 +32,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const { id } = await params;
   await dbQuery("DELETE FROM training_categories WHERE id = ?", [id]);
   return NextResponse.json({ success: true, message: "Category deleted" });

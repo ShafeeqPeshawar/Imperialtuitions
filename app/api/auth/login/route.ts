@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { dbQuery } from "@/lib/db";
+import { apiErrorResponseMessage } from "@/lib/api-errors";
 import { authCookieName, createSessionToken } from "@/lib/auth";
 
 type UserWithPassword = {
@@ -47,10 +48,10 @@ export async function POST(request: Request) {
     return res;
   } catch (error) {
     console.error("login API error:", error);
-    const rawMessage = error instanceof Error ? error.message : "Unknown server error.";
-    const message = rawMessage.includes("Missing environment variable:")
-      ? `${rawMessage}. Please create/update .env at the project root and restart the dev server.`
-      : "Unable to login due to a server error. Please check server logs.";
+    const message = apiErrorResponseMessage(
+      error,
+      "Unable to login due to a server error. Please check server logs."
+    );
     return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }

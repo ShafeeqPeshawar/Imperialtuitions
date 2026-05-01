@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
 const schema = z
   .object({
@@ -19,8 +19,8 @@ type PasswordRow = { password: string };
 
 export async function PUT(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+    const auth = await requireUser();
+    if (!auth.ok) return auth.response;
 
     const body = await request.json();
     const parsed = schema.safeParse(body);
@@ -28,7 +28,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ success: false, message: "Invalid password data." }, { status: 422 });
     }
 
-    const rows = await dbQuery<PasswordRow[]>("SELECT password FROM users WHERE id = ? LIMIT 1", [user.id]);
+    const rows = await dbQuery<PasswordRow[]>("SELECT password FROM users WHERE id = ? LIMIT 1", [auth.user.id]);
     if (rows.length === 0) return NextResponse.json({ success: false, message: "User not found." }, { status: 404 });
 
     const ok = await bcrypt.compare(parsed.data.current_password, rows[0].password);
@@ -37,7 +37,7 @@ export async function PUT(request: Request) {
     }
 
     const hash = await bcrypt.hash(parsed.data.password, 12);
-    await dbQuery("UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?", [hash, user.id]);
+    await dbQuery("UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?", [hash, auth.user.id]);
     return NextResponse.json({ success: true, message: "Password updated." });
   } catch (error) {
     console.error("profile password API error:", error);

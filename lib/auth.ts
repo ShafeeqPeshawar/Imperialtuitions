@@ -24,7 +24,7 @@ export function createSessionToken(userId: number) {
   return `${payload}.${signature}`;
 }
 
-export function verifySessionToken(token: string | undefined) {
+function verifySessionToken(token: string | undefined) {
   if (!token) return null;
   const [payload, signature] = token.split(".");
   if (!payload || !signature) return null;

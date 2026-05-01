@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 import { sendMail } from "@/lib/mailer";
 import { freeCourseLaunchEmail } from "@/lib/email-templates";
 
@@ -12,15 +12,10 @@ type LaunchRow = {
   level: string | null;
 };
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 export async function GET() {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
 
   const launches = await dbQuery<LaunchRow[]>(
     `SELECT cl.id, cl.course_id, cl.launch_date, c.title as course_title, c.level
@@ -33,8 +28,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const body = (await request.json()) as { course_id?: number; launch_date?: string };
   const courseId = Number(body.course_id ?? 0);
   const launchDate = String(body.launch_date ?? "").trim();

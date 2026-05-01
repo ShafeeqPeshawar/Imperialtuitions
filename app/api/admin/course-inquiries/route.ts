@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
 type InquiryRow = {
   id: number;
@@ -16,15 +16,10 @@ type InquiryRow = {
   created_at: string;
 };
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 export async function GET(request: NextRequest) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const page = Math.max(1, Number(request.nextUrl.searchParams.get("page") ?? "1"));
   const limit = 20;
   const offset = (page - 1) * limit;

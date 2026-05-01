@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
 import { dbQuery } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireUser } from "@/lib/api-auth";
 
 type CourseRow = { id: number; title: string; is_popular: number };
 
-async function ensureAuth() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return user;
-}
 
 export async function GET() {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const courses = await dbQuery<CourseRow[]>(
     "SELECT id, title, is_popular FROM courses WHERE is_popular = 1 ORDER BY sort_order ASC, id DESC"
   );
@@ -20,8 +15,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const body = (await request.json()) as { selected_courses?: number[] };
   const selected = Array.isArray(body.selected_courses) ? body.selected_courses : [];
   if (!selected.length) {
@@ -33,8 +28,8 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const user = await ensureAuth();
-  if (!user) return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) return auth.response;
   const body = (await request.json()) as { selected_courses?: number[] };
   const selected = Array.isArray(body.selected_courses) ? body.selected_courses : [];
   if (!selected.length) {
