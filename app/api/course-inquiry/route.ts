@@ -54,7 +54,7 @@ export async function POST(request: Request) {
           success: false,
           id: result.insertId,
           message:
-            "Inquiry saved, but email service is not configured. Set MAIL_PASSWORD in nextjs/.env and restart dev server.",
+            "Inquiry saved, but email service is not configured. Set MAIL_PASSWORD in .env at the project root and restart dev server.",
         },
         { status: 503 }
       );

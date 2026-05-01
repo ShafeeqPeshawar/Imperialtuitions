@@ -2,10 +2,9 @@
 
 ## 1) Run the application locally
 
-From terminal:
+From terminal, in the **project root** (where `package.json` lives):
 
 ```bash
-cd "C:\S H A F E E Q\Cursor_Projects\Imperial Tuitions-14\nextjs"
 npm install
 npm run dev
 ```
@@ -28,7 +27,7 @@ Then open `http://localhost:3001`.
 
 Create this file:
 
-- `nextjs/.env`
+- `.env` in the **project root** (next to `package.json`)
 
 Minimum example:
 
@@ -50,7 +49,7 @@ MAIL_PASSWORD=your-app-password
 MAIL_FROM_ADDRESS=your-email@gmail.com
 ```
 
-If `.env` is missing, homepage data fetch can fail with:
+Copy from `.env.example` if helpful. If `.env` is missing, homepage data fetch can fail with:
 
 - `Missing environment variable: DB_HOST`
 
@@ -126,12 +125,13 @@ Optional follow-up actions:
 
 Cause:
 
-- Running command in Laravel root, not in `nextjs` folder.
+- Running a different project, or the dev server was started from the wrong folder.
 
 Fix:
 
+- `cd` to this repo root (where `package.json` is), then:
+
 ```bash
-cd "C:\S H A F E E Q\Cursor_Projects\Imperial Tuitions-14\nextjs"
 npm run dev
 ```
 
@@ -155,12 +155,17 @@ Action:
 
 - Restart dev server once.
 
+### D) Leftover `nextjs/` folder after layout change
+
+If an empty or cache-only `nextjs` folder remains, stop all Node/dev processes using it, then delete that folder. The app now runs from the repository root.
+
 ---
 
 ## 7) Production-style run
 
+From project root:
+
 ```bash
-cd "C:\S H A F E E Q\Cursor_Projects\Imperial Tuitions-14\nextjs"
 npm run lint
 npm run build
 npm run start
@@ -177,4 +182,3 @@ Open and verify:
 - `/admin/courses`
 - Add one test course
 - Verify it appears in list
-

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       {
         success: false,
         message:
-          "Email is not configured. Set MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD in nextjs/.env and restart the server.",
+          "Email is not configured. Set MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD in .env at the project root and restart the server.",
       },
       { status: 503 }
     );

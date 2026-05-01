@@ -1,19 +1,63 @@
+# See https://help.github.com/articles/ignoring-files/
+
+# Laravel / legacy tooling
 /.phpunit.cache
 Homestead.json
 Homestead.yaml
-npm-debug.log
-yarn-error.log
 /auth.json
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Remove locally if still present (old nested app path; dev must run from repo root)
+/nextjs/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env (keep tracked example files)
+.env
+.env.local
+.env.backup
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Vercel
+.vercel
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Editors / OS
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
-
-# Root-level artifacts (not part of the Next app)
-node_modules/
-
-# Local env at repo root if present
-/.env
-/.env.backup
-/.env.production

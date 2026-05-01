@@ -1,21 +1,20 @@
 # Imperial Tuitions
 
-Production application: **Next.js** in the [`nextjs/`](nextjs/) folder.
+Next.js production app (App Router): course catalog, admin, inquiries, enrollments, email notifications.
 
 ## Quick start
 
 ```bash
-cd nextjs
 npm install
 cp .env.example .env
-# Edit .env (database, AUTH_SECRET, mail)
+# Edit .env: DB_*, AUTH_SECRET, APP_URL_NEXT, MAIL_*
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000).
 
-See [`nextjs/RUN_AND_ADMIN_GUIDE.md`](nextjs/RUN_AND_ADMIN_GUIDE.md) for details.
+See [RUN_AND_ADMIN_GUIDE.md](RUN_AND_ADMIN_GUIDE.md) for admin URLs, SMTP, and common issues.
 
 ## Legacy
 
-The previous Laravel/Blade app was removed from this repository. Database schema and uploads you still use should match what the Next app expects; course images live under `nextjs/public/images/`.
+The old Laravel / Blade tree was removed. Course images live under `public/images/` (database paths should match filenames).
