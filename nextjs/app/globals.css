@@ -381,6 +381,10 @@ body {
   gap: 12px;
   margin-top: auto;
   padding-top: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px;
+  background: #f8fafc;
 }
 
 .course-actions .btn-primary,
@@ -406,6 +410,27 @@ body {
   background: linear-gradient(135deg, #0f766e, #0d9488);
   border-color: #0f766e;
   color: #ffffff;
+}
+
+.course-hero-left .course-actions .course-register-btn {
+  margin-right: 0;
+  font-weight: 800;
+}
+
+.course-hero-left .course-actions .course-inquiry-btn {
+  margin-right: auto;
+}
+
+.course-hero-left .course-actions .btn-primary {
+  min-width: 110px;
+}
+
+.course-hero-left .course-actions .btn-primary {
+  border: 1px solid #166534;
+}
+
+.course-hero-left .course-actions .btn-primary:hover {
+  border-color: #14532d;
 }
 
 .home-course-card {
@@ -1228,7 +1253,7 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 390px;
   gap: 26px;
-  align-items: start;
+  align-items: stretch;
   margin-top: 6px;
 }
 
@@ -1249,12 +1274,14 @@ body {
 }
 
 .course-snapshot-card {
-  border: 1px solid #d8dee5;
+  border: 1px solid #cbd5e1;
   background: #ffffff;
   border-radius: 14px;
-  padding: 16px;
+  padding: 16px 16px 30px;
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
-  margin-top: 18px;
+  margin-top: 0;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .course-snapshot-card h3 {

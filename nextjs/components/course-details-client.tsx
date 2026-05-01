@@ -284,7 +284,8 @@ export function CourseDetailsClient({ course, relatedCourses }: Props) {
                   )}
                 </div>
                 <div className="course-actions">
-                  <button className="btn-primary" type="button" onClick={() => setInquiryOpen(true)}>Inquiry</button>
+                  <button className="btn-primary course-register-btn" type="button" onClick={() => setEnrollOpen(true)}>Reigter</button>
+                  <button className="btn-primary course-inquiry-btn" type="button" onClick={() => setInquiryOpen(true)}>Inquiry</button>
                   <button className="btn-primary" type="button" onClick={downloadCoursePdfOnly}>PDF</button>
                   <button className="btn-primary" type="button" onClick={printCourseOnly}>Print</button>
                   <button className="btn-primary" type="button" onClick={shareCourse}>Share</button>
@@ -299,9 +300,6 @@ export function CourseDetailsClient({ course, relatedCourses }: Props) {
                   <span className="course-meta-pill"><i className="bi bi-bar-chart-steps" />Level: {course.level ?? "N/A"}</span>
                   <span className="course-meta-pill"><i className="bi bi-clock" />Duration: {course.duration ?? "N/A"}</span>
                   <span className="course-meta-pill"><i className="bi bi-laptop" />Mode: Online / Virtual</span>
-                </div>
-                <div className="course-snapshot-actions">
-                  <button className="btn-primary" type="button" onClick={() => setEnrollOpen(true)}>Register Now</button>
                 </div>
               </aside>
             </div>
