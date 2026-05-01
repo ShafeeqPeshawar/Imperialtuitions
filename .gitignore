@@ -1,16 +1,4 @@
 /.phpunit.cache
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
 Homestead.json
 Homestead.yaml
 npm-debug.log
@@ -21,3 +9,11 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Root-level artifacts (not part of the Next app)
+node_modules/
+
+# Local env at repo root if present
+/.env
+/.env.backup
+/.env.production
